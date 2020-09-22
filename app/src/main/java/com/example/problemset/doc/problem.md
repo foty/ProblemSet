@@ -1,4 +1,4 @@
-使用 TabLayout，Activity应用主题不当问题：
+##### 使用 TabLayout，Activity应用主题不当问题：
 起因:有个项目要使用一种比较古老风格(项目原因，而不是要做成这个古老)。呐，就是类似这种风格  
 <图片1>  
 所有的弹窗提示等都是这种风格。主题样式代码:
@@ -65,3 +65,33 @@ class ThemeUtils {
 我的这个项目属于比较老的，compileSdkVersion = 23。因此可以这样处理，用同样的方式写个新demo(androidX)运行，同样使用非Theme.AppCompat主题
 或者没有继承自Theme.AppCompat的主题，TabLayout依然会报错，但是报错信息不一样。错误定位不在TabLayout类，而是在activity上。感兴趣的
 可以自己试验，就不多说了。最好的处理方式还是去修改主题吧，毕竟现在还用那么古老的风格真的不多。
+
+
+
+##### UnsatisfiedLinkError,couldn't find "*.so"
+
+部分完整的日志错误(省略部分敏感信息)
+```html
+ java.lang.UnsatisfiedLinkError: dalvik.system.PathClassLoader[DexPathList[[zip file "*.base.apk"],nativeLibraryDirectories=[/vendor/lib, /system/lib]]] couldn't find "***.so"
+        at java.lang.Runtime.loadLibrary(Runtime.java:366)
+        at java.lang.System.loadLibrary(System.java:988)
+        at com.* Jni.<clinit>(*.java:8)
+        at com.* <init>(*.java:26)
+```
+错误分析: 应用使用到了.so库方法，但是没有找到so库。  
+
+原因：还是老古董工程，AS版本为3.5.3，但项目内仍用以前的2.3.3，gradle版本为4.4。在某一天需要修改时发现无法编译通过，便修改项目使用版本为3.5.3。之后出现
+以上问题。(祖传代码)
+
+解决:   
+在 build.gradle文件(app)下的 defaultConfig{ }内添加NDK配置：
+```
+ ndk {
+    abiFilters "x86", "armeabi" // ...还有其它的cpu架构，根据自己需要配置
+ }
+```
+若以上处理没有解决可尝试在gradle.properties文件添加：(非亲测)
+```groovy
+ android.useDeprecatedNdk=true
+```
+
