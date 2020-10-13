@@ -1,15 +1,13 @@
 ##### 使用 TabLayout，Activity应用主题不当问题：
-起因:有个项目要使用一种比较古老风格(项目原因，而不是要做成这个古老)。呐，就是类似这种风格  
-<图片1>  
-所有的弹窗提示等都是这种风格。主题样式代码:
+原因: 项目要使用一种比较古老风格(项目原因，而不是要做成这个古老)。所有的弹窗提示等都是这种风格。主题样式代码:
 ```
     <style name="ThemeNoTitle" parent="android:Theme">
         //...省略代码//
         
     </style>
 ```
-后来引进TabLayout，在它的activity应用这种主题后,产生以下错误：
-<图片2>
+后来引进TabLayout，在它的activity应用这种主题后,产生以下错误：  
+`TabLayout: Error inflating class android.support.design.widget.TabLayout`  
 
 在错误日志中其实就已经说明错误原因以及解决方案。总的来说是因为包含TabLayout的那个activity的应用主题使用不
 恰当，应该使用Theme.AppCompat主题或者继承自Theme.AppCompat的主题。而我的应用主题是继承至`android:Theme`。
@@ -17,9 +15,7 @@
 默认的。   
 但是这样就不符合我应用的古朴风格了，所以还是应该要去处理这个问题的。在一番探索下发现了一个解决办法。  
 仔细看错误信息，发现这个错误抛出的具体位置是在一个TabLayout类中调用ThemeUtils.checkAppCompatTheme(context)方
-法导致的：
-<图片3>
-以及ThemeUtils的代码:
+法导致的。ThemeUtils的代码:
 ```java
 class ThemeUtils {
     private static final int[] APPCOMPAT_CHECK_ATTRS;
@@ -61,12 +57,8 @@ class ThemeUtils {
     </style>
 ```
 运行后TabLayout不再报错，问题解决。  
-另外：  
-我的这个项目属于比较老的，compileSdkVersion = 23。因此可以这样处理，用同样的方式写个新demo(androidX)运行，同样使用非Theme.AppCompat主题
-或者没有继承自Theme.AppCompat的主题，TabLayout依然会报错，但是报错信息不一样。错误定位不在TabLayout类，而是在activity上。感兴趣的
-可以自己试验，就不多说了。最好的处理方式还是去修改主题吧，毕竟现在还用那么古老的风格真的不多。
 
-
+上述已发布成blog。地址:<https://blog.csdn.net/FooTyzZ/article/details/107669822>
 
 ##### UnsatisfiedLinkError,couldn't find "*.so"
 
@@ -95,3 +87,51 @@ class ThemeUtils {
  android.useDeprecatedNdk=true
 ```
 
+
+##### Glide(3.7)-- 加载圆角图片，四角出现黑色区域问题。  
+原因：  
+
+解决：  
+使用.transform()手动转换解码，直接copy代码：
+```
+Glide.with(context)
+        .load(imgFile)
+        .dontAnimate()
+        .transform(new BitmapTransformation(context) {
+            @Override
+            protected Bitmap transform(BitmapPool pool, Bitmap toTransform, int outWidth, int outHeight) {
+                if (toTransform == null) return null;
+                Bitmap result = pool.get(toTransform.getWidth(), toTransform.getHeight(), Bitmap.Config.ARGB_8888);
+                if (result == null) {
+                    result = Bitmap.createBitmap(toTransform.getWidth(), toTransform.getHeight(), Bitmap.Config.ARGB_8888);
+                }
+                Canvas canvas = new Canvas(result);
+                Paint paint = new Paint();
+                paint.setShader(new BitmapShader(toTransform, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP));
+                paint.setAntiAlias(true);
+                RectF rectF = new RectF(0f, 0f, toTransform.getWidth(), toTransform.getHeight());
+                //设置圆角大小
+                canvas.drawRoundRect(rectF, DisplayUtil.dp2px(4), DisplayUtil.dp2px(4), paint);
+                return result;
+            }
+            @Override
+            public String getId() {
+                return "一个id";
+            }
+            })
+        .override(DisplayUtil.dp2px(50),DisplayUtil.dp2px(50))
+        .into(imageView);
+```
+
+在`getId()`方法需要返回一个id，这个id可以使用自己项目的包名或者其他自定义字符串。
+
+
+##### Glide(3.7)-- 列表加载图片出现大小不一的情况。  
+原因：  
+
+解决：  
+使用.override()设置大小。或者在.transform()多增加一个参数。如CenterCrop对象。理论上只要调整.transform()方法参数即可，实际看情况使用。
+完整代码：
+```
+ Glide.transform(new CenterCrop(context),new BitmapTransformation(context) {...})
+```
