@@ -151,7 +151,21 @@ Glide.with(context)
 1.添加'com.android.support:multidex:1.0.0' 依赖。  
 2.在自定义的Application类中重写attachBaseContext()方法，添加初始化代码: MultiDex.install(this)。
 
+<p>
 
+##### kotlin+Retrofit 上传RequestBody类型参数识别为？
+操作环境: 使用retrofit上传图片，使用RequestBody类型作为参数上传，结果参数无法被识别出来具体描述(报错log):
+
+> Parameter type must not include a type variable or wildcard: java.util.Map<java.lang.String, 
+? extends okhttp3.RequestBody> (parameter #1)
+
+解决方案:添加 @JvmSuppressWildcards注解RequestBody参数。  
+具体代码如下:
+```
+@POST("/test/text")
+@Multipart
+fun getData(@PartMap map: Map<String, @JvmSuppressWildcards RequestBody>): Observable<ResponseData>
+```
 
 
 
