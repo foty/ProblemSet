@@ -60,6 +60,8 @@ class ThemeUtils {
 
 上述已发布成blog。地址:<https://blog.csdn.net/FooTyzZ/article/details/107669822>
 
+<p>
+
 ##### UnsatisfiedLinkError,couldn't find "*.so"
 
 部分完整的日志错误(省略部分敏感信息)
@@ -87,6 +89,7 @@ class ThemeUtils {
  android.useDeprecatedNdk=true
 ```
 
+<p>
 
 ##### Glide(3.7)-- 加载圆角图片，四角出现黑色区域问题。  
 原因：  
@@ -125,6 +128,7 @@ Glide.with(context)
 
 在`getId()`方法需要返回一个id，这个id可以使用自己项目的包名或者其他自定义字符串。
 
+<p>
 
 ##### Glide(3.7)-- 列表加载图片出现大小不一的情况。  
 原因：  
@@ -135,3 +139,19 @@ Glide.with(context)
 ```
  Glide.transform(new CenterCrop(context),new BitmapTransformation(context) {...})
 ```
+
+<p>
+
+##### 65535问题(旧问题，现在不知是否被优化了-2020)
+原因: android系统将项目转换成dex文件时会对dex文件优化，将项目内的方法检索记录保存在链表中，链表长度类型为short。
+导致项目内方法数量不能超过65536个。
+
+解决：设置成多dex模式。   
+处理步骤  
+1.添加'com.android.support:multidex:1.0.0' 依赖。  
+2.在自定义的Application类中重写attachBaseContext()方法，添加初始化代码: MultiDex.install(this)。
+
+
+
+
+
