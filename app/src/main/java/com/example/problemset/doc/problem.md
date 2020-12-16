@@ -172,5 +172,17 @@ fun getData(@PartMap map: Map<String, @JvmSuppressWildcards RequestBody>): Obser
 
 解决方案(参考方向之一)：检查是否开启混淆，bean是否添加到了混淆文件。
 
+<p>
+
+
+##### RadioGroup/RadioButton 实现单选功能初始化都不选中状态问题
+操作环境：单选选择，结果保存之后需要恢复到默认都不选中状态，使用
+```
+RadioButton1.setChecked(false)
+RadioButton2.setChecked(false)
+```
+达到默认效果，但是再次点击时，其中一个无法被选中，等另外一个被选中后，才能被选中。  
+原因： 原因未寻找  
+解决方案：使用 `RadioGroup.clearCheck()`的方式替换`setChecked(false)`实现默认不选中效果。
 
 
