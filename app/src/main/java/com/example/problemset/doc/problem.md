@@ -166,6 +166,11 @@ Glide.with(context)
 @Multipart
 fun getData(@PartMap map: Map<String, @JvmSuppressWildcards RequestBody>): Observable<ResponseData>
 ```
+<p>
+
+##### debug版本程序正常运行，release版本解析数据bean却为null。
+
+解决方案(参考方向之一)：检查是否开启混淆，bean是否添加到了混淆文件。
 
 
 
