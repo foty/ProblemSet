@@ -185,4 +185,15 @@ RadioButton2.setChecked(false)
 原因： 原因未寻找  
 解决方案：使用 `RadioGroup.clearCheck()`的方式替换`setChecked(false)`实现默认不选中效果。
 
+<p>
 
+##### KT协程+Retrofit抛出异常 "java.lang.IllegalArgumentException"
+具体异常信息: `java.lang.IllegalArgumentException: Unable to create call adapter for class 
+java.lang.Object`   
+操作环境：使用retrofit+kt协程实现网络请求。   
+原因：  
+1、retrofit没有正确配置adapter。   
+2、retrofit版本与协程版本不兼容。(具体是反射解析?)   
+解决方案：
+* 第一种情况：正确配置即可。
+* 第二种情况：retrofit在2.6.0以下会产生上述问题，将retrofit版本提高即可(参考版本:2.6.2)。
