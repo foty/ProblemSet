@@ -197,3 +197,71 @@ java.lang.Object`
 解决方案：
 * 第一种情况：正确配置即可。
 * 第二种情况：retrofit在2.6.0以下会产生上述问题，将retrofit版本提高即可(参考版本:2.6.2)。
+
+<p>
+
+##### 使用BRVAH编写树形列表(可展开收缩子列表) 
+异常信息:      
+> java.lang.IndexOutOfBoundsException: Inconsistency detected.   
+ Invalid item position 8(offset:3).state:18 androidx.recyclerview.widget.  
+ RecyclerView{33cf87f4 VFED.... ......ID 0,309-1080,1530 #7f09060d app:id/recyclerView},   
+ adapter:Adapter@25816b1d,layout:androidx.recyclerview.widget.LinearLayoutManager@1c2ba192,
+ Activity@32ec6c48  
+ 
+ 操作情况: adapter继承 BaseNodeAdapter,所有数据类也都继承了BaseExpandNode。列表也能如期展现出来。但是在触发收起
+ 展开逻辑时，抛出以上异常。   
+ 原因: 
+ 实质原因不明，写法原因是出在给adapter填充数据源的列表上,开始的：
+ ```
+ List<Data.ItemDataBean> childs = new ArrayList<>();
+ for (int i1 = 0; i1 < 5; i1++) {
+     Data.ItemDataBean item = new Data.ItemDataBean();
+     item.setName("孩子" + i1);
+     childs.add(item);
+ }
+ List<Data.DataBean> parents = new ArrayList<>();
+ for (int i = 0; i < 3; i++) {
+     Data.DataBean bean = new Data.DataBean();
+     bean.setName("大爷" + i);
+     bean.setItemDataBeans(childs);
+     parents.add(bean);
+ }
+ //parents模拟成符合成服务器返回的数据
+ for (int i = 0; i < parents.size(); i++) {
+     Data.DataBean bean = parents.get(i);
+     for (int j = 0; j < bean.getItemDataBeans().size(); j++) {
+         Data.ItemDataBean itemDataBean = bean.getItemDataBeans().get(j);
+         bean.addChildNode(itemDataBean);
+     }
+ }
+
+ ```
+ 这里注意的是我先创建一个子列表，然后在创建父列表，再将子列表分别设置给每一个父列表。这样就产生了上述问题。   
+ 解决方案: 更换数据拼装写法: 
+ ```
+ List<Data.DataBean> parents = new ArrayList<>();
+ for (int i = 0; i < 3; i++) {
+     Data.DataBean bean = new Data.DataBean();
+     bean.setName("大爷" + i);
+     
+     List<Data.ItemDataBean> childs = new ArrayList<>();
+     for (int i1 = 0; i1 < 5; i1++) {
+          Data.ItemDataBean item = new Data.ItemDataBean();
+          item.setName("孩子" + i1);
+          childs.add(item);
+     }
+     
+     bean.setItemDataBeans(childs);
+     parents.add(bean);
+ }
+ //parents模拟成符合成服务器返回的数据
+ for (int i = 0; i < parents.size(); i++) {
+     Data.DataBean bean = parents.get(i);
+     for (int j = 0; j < bean.getItemDataBeans().size(); j++) {
+         Data.ItemDataBean itemDataBean = bean.getItemDataBeans().get(j);
+         bean.addChildNode(itemDataBean);
+     }
+ }
+ ```
+ 2种写法区别就在与一个是共用所有的子列表，一个是不共用。还有就是，这份数据是在模拟真实服务器数据获取下来的(调试)，所以
+ 才会出现组装写法上的问题。但如果数据需要重新组装时也需要注意一下。
