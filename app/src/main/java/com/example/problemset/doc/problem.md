@@ -1,6 +1,6 @@
 ##### 使用 TabLayout，Activity应用主题不当问题：
 原因: 项目要使用一种比较古老风格(项目原因，而不是要做成这个古老)。所有的弹窗提示等都是这种风格。主题样式代码:
-```
+```html
     <style name="ThemeNoTitle" parent="android:Theme">
         //...省略代码//
         
@@ -40,7 +40,7 @@ class ThemeUtils {
 ```
 从这段代码中可以发现导致抛出异常原因是在TypedArray中没有找到某个或者某些属性，这些属性来自一个APPCOMPAT_CHECK_ATTRS的数组。
 看到``attr.colorPrimary``这个很容易就联想到主题当中的某个属性-colorPrimary。如下系统的style下：
-```
+```xml
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
@@ -212,7 +212,7 @@ java.lang.Object`
  展开逻辑时，抛出以上异常。   
  原因: 
  实质原因不明，写法原因是出在给adapter填充数据源的列表上,开始的：
- ```
+ ```html
  List<Data.ItemDataBean> childs = new ArrayList<>();
  for (int i1 = 0; i1 < 5; i1++) {
      Data.ItemDataBean item = new Data.ItemDataBean();
@@ -238,7 +238,7 @@ java.lang.Object`
  ```
  这里注意的是我先创建一个子列表，然后在创建父列表，再将子列表分别设置给每一个父列表。这样就产生了上述问题。   
  解决方案: 更换数据拼装写法: 
- ```
+ ```text
  List<Data.DataBean> parents = new ArrayList<>();
  for (int i = 0; i < 3; i++) {
      Data.DataBean bean = new Data.DataBean();
