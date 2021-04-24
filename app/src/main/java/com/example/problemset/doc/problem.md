@@ -50,7 +50,7 @@ class ThemeUtils {
     </style>
 ```
 自己声明的主题又确实没有定义colorPrimary这条。于是在自己的主题下添加这个属性：
-```
+```html
     <style name="ThemeNoTitle" parent="android:Theme">
        <item name="colorPrimary">#ffffff</item>
         //...省略代码//
@@ -79,7 +79,7 @@ class ThemeUtils {
 
 解决:   
 在 build.gradle文件(app)下的 defaultConfig{ }内添加NDK配置：
-```
+```groovy
  ndk {
     abiFilters "x86", "armeabi" // ...还有其它的cpu架构，根据自己需要配置
  }
@@ -96,7 +96,7 @@ class ThemeUtils {
 
 解决：  
 使用.transform()手动转换解码，直接copy代码：
-```
+```html
 Glide.with(context)
         .load(imgFile)
         .dontAnimate()
@@ -161,7 +161,7 @@ Glide.with(context)
 
 解决方案:添加 @JvmSuppressWildcards注解RequestBody参数。  
 具体代码如下:
-```
+```html
 @POST("/test/text")
 @Multipart
 fun getData(@PartMap map: Map<String, @JvmSuppressWildcards RequestBody>): Observable<ResponseData>
@@ -177,7 +177,7 @@ fun getData(@PartMap map: Map<String, @JvmSuppressWildcards RequestBody>): Obser
 
 ##### RadioGroup/RadioButton 实现单选功能初始化都不选中状态问题
 操作环境：单选选择，结果保存之后需要恢复到默认都不选中状态，使用
-```
+```html
 RadioButton1.setChecked(false)
 RadioButton2.setChecked(false)
 ```
